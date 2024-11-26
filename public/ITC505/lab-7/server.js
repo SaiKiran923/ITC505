@@ -1,109 +1,73 @@
-const express = require('express');
-const logger = require('morgan');
-const path = require('path');
-const server = express();
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM has been loaded and parsed successfully.");
+    
+    // Selecting the form element from the DOM
+    const formElement = document.querySelector('form');
 
-server.use(express.urlencoded({ extended: true }));
-server.use(logger('dev'));
+    // Handling the form submission
+    formElement.addEventListener('submit', (event) => {
+        event.preventDefault(); // Preventing default form submission behavior
 
-// Serve static files from the "public" folder
-const publicServedFilesPath = path.join(__dirname, 'public');
-server.use(express.static(publicServedFilesPath));
+        console.log("Form has been submitted.");
 
-// Regular expressions for validating each word type
-const nounPattern = /^[a-zA-Z]{2,}$/; // Noun: at least 2 alphabetic characters
-const verbPattern = /^[a-zA-Z]{2,}$/; // Verb: at least 2 alphabetic characters
-const adjectivePattern = /^[a-zA-Z]{2,}$/; // Adjective: at least 2 alphabetic characters
-const pluralNounPattern = /^[a-zA-Z]{2,}s$/; // Plural Noun: at least 2 alphabetic characters and ends with 's'
-const placePattern = /^[a-zA-Z\s]{2,}$/; // Place: at least 2 alphabetic characters or spaces (for multi-word places)
+        // Retrieving user input values and removing extra spaces
+        const nounInput = document.getElementById('noun').value.trim();
+        const adjectiveInput = document.getElementById('adjective').value.trim();
+        const verbInput = document.getElementById('verb').value.trim();
+        const pluralNounInput = document.getElementById('pluralNoun').value.trim();
+        const placeInput = document.getElementById('place').value.trim();
 
-// Route to handle Mad Libs form submission
-server.post('/ITC505/lab-7', (req, res) => {
-    const { noun, verb, adjective, pluralNoun, place } = req.body;
+        // Checking if all fields are filled out
+        if (!nounInput || !adjectiveInput || !verbInput || !pluralNounInput || !placeInput) {
+            alert("Please make sure all fields are filled out.");
+            return;
+        }
 
-    // Check if all fields are filled
-    if (!noun || !verb || !adjective || !pluralNoun || !place) {
-        return res.send(`
-            <h1>Submission Failed</h1>
-            <p>Please fill out all fields! All fields are required.</p>
-            <a href="/ITC505/lab-7">Go Back to Form</a>
-        `);
-    }
+        // Constructing the story string
+        const madLibStory = `
+            <h1>Your Mad Lib Adventure</h1>
+            <p>
+                In the land of <strong>${placeInput}</strong>, a <strong>${adjectiveInput}</strong> <strong>${nounInput}</strong>
+                had a passion for <strong>${verbInput}</strong> alongside a team of <strong>${pluralNounInput}</strong>.
+            </p>
+            <button onclick="window.close()">Close Window</button>
+        `;
 
-    // Validate the Noun field
-    if (!nounPattern.test(noun)) {
-        return res.send(`
-            <h1>Invalid Noun</h1>
-            <p>The Noun you entered is invalid. A valid Noun should be at least 3-6 alphabetic characters long (e.g., 'dog', 'cat').</p>
-            <a href="/ITC505/lab-7">Go Back to Form</a>
-        `);
-    }
+        // Creating a new browser window
+        const newWindowInstance = window.open("", "_blank", "width=600,height=400");
 
-    // Validate the Verb field
-    if (!verbPattern.test(verb)) {
-        return res.send(`
-            <h1>Invalid Verb</h1>
-            <p>The Verb you entered is invalid. A valid Verb should be at least 3-5 alphabetic characters long (e.g., 'run', 'eat').</p>
-            <a href="/ITC505/lab-7">Go Back to Form</a>
-        `);
-    }
-
-    // Validate the Adjective field
-    if (!adjectivePattern.test(adjective)) {
-        return res.send(`
-            <h1>Invalid Adjective</h1>
-            <p>The Adjective you entered is invalid. A valid Adjective should be at least 5-7 alphabetic characters long (e.g., 'happy', 'fast').</p>
-            <a href="/ITC505/lab-7">Go Back to Form</a>
-        `);
-    }
-
-    // Validate the Plural Noun field
-    if (!pluralNounPattern.test(pluralNoun)) {
-        return res.send(`
-            <h1>Invalid Plural Noun</h1>
-            <p>The Plural Noun you entered is invalid. A valid Plural Noun should be at least 5-7 alphabetic characters and end with an 's' (e.g., 'dogs', 'cats').</p>
-            <a href="/ITC505/lab-7">Go Back to Form</a>
-        `);
-    }
-
-    // Validate the Place field
-    if (!placePattern.test(place)) {
-        return res.send(`
-            <h1>Invalid Place</h1>
-            <p>The Place you entered is invalid. A valid Place should be at least 5-10 alphabetic characters long or a multi-word name like 'New York' (e.g., 'park', 'beach').</p>
-            <a href="/ITC505/lab-7">Go Back to Form</a>
-        `);
-    }
-
-    // If all fields are valid, generate the Mad Lib
-    const madLib = `Once upon a time, there was a ${adjective} ${noun} who loved to ${verb} near the ${pluralNoun} in the ${place}.`;
-
-    res.send(`
-        <h1>Mad Lib Result</h1>
-        <p>${madLib}</p>
-        <a href="/ITC505/lab-7">Go Back to Form</a>
-    `);
+        // Writing the generated story to the new window
+        if (newWindowInstance) {
+            newWindowInstance.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Mad Libs Story</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
+                            line-height: 1.6;
+                            text-align: center;
+                        }
+                        button {
+                            margin-top: 20px;
+                            padding: 10px 20px;
+                            font-size: 16px;
+                            cursor: pointer;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${madLibStory}
+                </body>
+                </html>
+            `);
+            newWindowInstance.document.close(); // Finalizing the content in the new window
+        } else {
+            alert("Popup was blocked. Please allow popups to see your story.");
+        }
+    });
 });
-
-// Random number route
-server.get('/do_a_random', (req, res) => {
-    res.send(`Your number is: ${Math.floor(Math.random() * 100) + 1}`);
-});
-
-// Start the server
-let port = 80;
-if (process.argv[2] === 'local') {
-    port = 8080;
-}
-server.listen(port, () => console.log('Ready on localhost!'));
-
-
-
-
-
-
-
-
-
-
-
