@@ -1,55 +1,73 @@
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
-    const fields = {
-        noun: document.getElementById("noun"),
-        verb: document.getElementById("verb"),
-        adjective: document.getElementById("adjective"),
-        pluralNoun: document.getElementById("pluralNoun"),
-        place: document.getElementById("place")
-    };
+document.addEventListener('DOMContentLoaded', () => {
+    console.log("DOM has been loaded and parsed successfully.");
+    
+    // Selecting the form element from the DOM
+    const formElement = document.querySelector('form');
 
-    const patterns = {
-        noun: /^[a-zA-Z]{2,}$/,
-        verb: /^[a-zA-Z]{2,}$/,
-        adjective: /^[a-zA-Z]{2,}$/,
-        pluralNoun: /^[a-zA-Z]{2,}s$/,
-        place: /^[a-zA-Z\s]{2,}$/
-    };
+    // Handling the form submission
+    formElement.addEventListener('submit', (event) => {
+        event.preventDefault(); // Preventing default form submission behavior
 
-    // Real-time validation
-    Object.keys(fields).forEach((key) => {
-        fields[key].addEventListener("input", function () {
-            validateField(fields[key], patterns[key]);
-        });
-    });
+        console.log("Form has been submitted.");
 
-    // Form submission event
-    form.addEventListener("submit", function (event) {
-        let valid = true;
+        // Retrieving user input values and removing extra spaces
+        const nounInput = document.getElementById('noun').value.trim();
+        const adjectiveInput = document.getElementById('adjective').value.trim();
+        const verbInput = document.getElementById('verb').value.trim();
+        const pluralNounInput = document.getElementById('pluralNoun').value.trim();
+        const placeInput = document.getElementById('place').value.trim();
 
-        // Validate all fields before submission
-        Object.keys(fields).forEach((key) => {
-            if (!validateField(fields[key], patterns[key])) {
-                valid = false;
-            }
-        });
-
-        if (!valid) {
-            event.preventDefault();
-            alert("Please fix the highlighted errors before submitting the form.");
+        // Checking if all fields are filled out
+        if (!nounInput || !adjectiveInput || !verbInput || !pluralNounInput || !placeInput) {
+            alert("Please make sure all fields are filled out.");
+            return;
         }
-    });
 
-    // Function to validate individual fields
-    function validateField(field, pattern) {
-        if (pattern.test(field.value)) {
-            field.style.borderColor = "green";
-            field.setCustomValidity(""); // Clear any custom error message
-            return true;
+        // Constructing the story string
+        const madLibStory = `
+            <h1>Your Mad Lib Adventure</h1>
+            <p>
+                In the land of <strong>${placeInput}</strong>, a <strong>${adjectiveInput}</strong> <strong>${nounInput}</strong>
+                had a passion for <strong>${verbInput}</strong> alongside a team of <strong>${pluralNounInput}</strong>.
+            </p>
+            <button onclick="window.close()">Close Window</button>
+        `;
+
+        // Creating a new browser window
+        const newWindowInstance = window.open("", "_blank", "width=600,height=400");
+
+        // Writing the generated story to the new window
+        if (newWindowInstance) {
+            newWindowInstance.document.write(`
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Mad Libs Story</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 20px;
+                            line-height: 1.6;
+                            text-align: center;
+                        }
+                        button {
+                            margin-top: 20px;
+                            padding: 10px 20px;
+                            font-size: 16px;
+                            cursor: pointer;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${madLibStory}
+                </body>
+                </html>
+            `);
+            newWindowInstance.document.close(); // Finalizing the content in the new window
         } else {
-            field.style.borderColor = "red";
-            field.setCustomValidity("Invalid input.");
-            return false;
+            alert("Popup was blocked. Please allow popups to see your story.");
         }
-    }
+    });
 });
