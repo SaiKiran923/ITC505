@@ -1,0 +1,19 @@
+{
+  "name": "lab7-madlib",
+  "version": "1.0.0",
+  "description": "Mad Lib Game Lab 7",
+  "main": "server.js",
+  "scripts": {
+    "start": "cross-env DEBUG=myexpressapp:* node server.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.1",
+    "morgan": "^1.10.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "license": "ISC"
+}
+
